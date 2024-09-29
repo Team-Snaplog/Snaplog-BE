@@ -1,4 +1,4 @@
-package site.snaplog.core.entities
+package site.snaplog.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column

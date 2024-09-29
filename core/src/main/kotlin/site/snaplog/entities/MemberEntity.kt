@@ -1,8 +1,8 @@
-package site.snaplog.core.entities
+package site.snaplog.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import site.snaplog.core.enums.Provider
+import site.snaplog.enums.Provider
 
 @Table("member")
 data class MemberEntity(

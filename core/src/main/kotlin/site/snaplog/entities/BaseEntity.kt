@@ -1,4 +1,4 @@
-package site.snaplog.core.entities
+package site.snaplog.entities
 
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate

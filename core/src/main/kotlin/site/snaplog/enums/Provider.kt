@@ -1,4 +1,4 @@
-package site.snaplog.core.enums
+package site.snaplog.enums
 
 enum class Provider {
     GOOGLE,

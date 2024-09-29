@@ -1,11 +1,11 @@
-package site.snaplog.core.jasypt
+package site.snaplog.jasypt
 
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
-import site.snaplog.core.configurations.JasyptConfig
+import site.snaplog.configurations.JasyptConfig
 
 @SpringBootTest(classes = [JasyptConfig::class])
 class JasyptTest {

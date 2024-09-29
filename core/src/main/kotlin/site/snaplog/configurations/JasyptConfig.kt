@@ -1,4 +1,4 @@
-package site.snaplog.core.configurations
+package site.snaplog.configurations
 
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor
 import org.springframework.beans.factory.annotation.Value
