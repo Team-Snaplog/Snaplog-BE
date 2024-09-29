@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
-import site.snaplog.configurations.JasyptConfig
+import site.snaplog.config.JasyptConfig
 
 @SpringBootTest(classes = [JasyptConfig::class])
 class JasyptTest {
