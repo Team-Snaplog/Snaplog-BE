@@ -2,7 +2,7 @@ package site.snaplog.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import site.snaplog.enums.Provider
+import site.snaplog.util.enums.Provider
 
 @Table("member")
 data class MemberEntity(

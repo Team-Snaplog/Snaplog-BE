@@ -7,7 +7,7 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-import site.snaplog.util.ColorCode
+import site.snaplog.util.consts.ColorCode
 
 @Component
 class LoggingFilter: WebFilter {
