@@ -1,4 +1,4 @@
-package site.snaplog.interceptor
+package site.snaplog.util.logging
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,14 +30,11 @@ class LoggingFilter: WebFilter {
                     .put("requestId", requestId)
                     .put("requestUrl", requestUrl)
                     .put("method", method)
+                    .put("requestTime", requestTime)
             }
             .doOnSuccess {
                 val spendTime = System.currentTimeMillis() - requestTime
                 logger.info("${ColorCode.GREEN}[${requestId}]${ColorCode.BLUE}[Response]${ColorCode.RESET} ${response.statusCode} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
-            }
-            .doOnError { error ->
-                val spendTime = System.currentTimeMillis() - requestTime
-                logger.error("${ColorCode.GREEN}[${requestId}]${ColorCode.RED}[Error]${ColorCode.RESET} ${error.message} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
             }
     }
 }
