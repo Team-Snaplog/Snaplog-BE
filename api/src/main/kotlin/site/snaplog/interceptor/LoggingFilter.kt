@@ -17,7 +17,7 @@ class LoggingFilter: WebFilter {
         val request = exchange.request
         val response = exchange.response
         val requestId = request.id
-        val requestUrl = request.uri.toString()
+        val requestUrl = request.uri.path
         val method = request.method.name()
         val requestTime = System.currentTimeMillis()
 
