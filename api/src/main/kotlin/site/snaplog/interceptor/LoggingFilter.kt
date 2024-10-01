@@ -7,6 +7,7 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
+import site.snaplog.util.ColorCode
 
 @Component
 class LoggingFilter: WebFilter {
@@ -21,7 +22,7 @@ class LoggingFilter: WebFilter {
         val method = request.method.name()
         val requestTime = System.currentTimeMillis()
 
-        logger.info("[${requestId}][Request] $method $requestUrl")
+        logger.info("${ColorCode.GREEN}[${requestId}]${ColorCode.CYAN}[Request]${ColorCode.RESET} $method $requestUrl")
 
         return chain.filter(exchange)
             .contextWrite { context ->
@@ -32,11 +33,11 @@ class LoggingFilter: WebFilter {
             }
             .doOnSuccess {
                 val spendTime = System.currentTimeMillis() - requestTime
-                logger.info("[${requestId}][Response] ${response.statusCode} - ${spendTime}ms")
+                logger.info("${ColorCode.GREEN}[${requestId}]${ColorCode.BLUE}[Response]${ColorCode.RESET} ${response.statusCode} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
             }
             .doOnError { error ->
                 val spendTime = System.currentTimeMillis() - requestTime
-                logger.error("[${requestId}][Error] ${error.message} - ${spendTime}ms")
+                logger.error("${ColorCode.GREEN}[${requestId}]${ColorCode.RED}[Error]${ColorCode.RESET} ${error.message} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
             }
     }
 }
