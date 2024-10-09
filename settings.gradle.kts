@@ -11,7 +11,8 @@ listOf(
 
 // libs/infra 하위 모듈 세팅
 listOf(
-    "mysql"
+    "mysql",
+    "redis",
 ).forEach {
     include(it)
     project(":$it").projectDir = File("$rootDir/libs/infra/$it")
