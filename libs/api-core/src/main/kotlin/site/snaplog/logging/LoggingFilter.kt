@@ -2,14 +2,17 @@ package site.snaplog.logging
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-import site.snaplog.util.ColorCode
+import site.snaplog.util.consts.ColorCode
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 class LoggingFilter: WebFilter {
 
     private val logger: Logger = LoggerFactory.getLogger(LoggingFilter::class.java)
