@@ -17,7 +17,6 @@ import site.snaplog.security.service.JwtService
 import site.snaplog.util.consts.Uri
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 class JwtFilter(
     private val jwtService: JwtService,
     private val memberRepository: MemberRepository
