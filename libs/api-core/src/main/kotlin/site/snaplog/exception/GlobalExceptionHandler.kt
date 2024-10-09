@@ -12,7 +12,7 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import site.snaplog.enums.StatusCode
 import site.snaplog.response.SnaplogErrorResponse
-import site.snaplog.util.ColorCode
+import site.snaplog.util.consts.ColorCode
 
 @Component
 @Order(-2)
