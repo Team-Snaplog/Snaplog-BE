@@ -1,4 +1,4 @@
-package site.snaplog.util
+package site.snaplog.util.consts
 
 object ColorCode {
 
