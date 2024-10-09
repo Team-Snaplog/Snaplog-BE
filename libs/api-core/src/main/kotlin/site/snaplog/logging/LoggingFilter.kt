@@ -35,9 +35,5 @@ class LoggingFilter: WebFilter {
                 val spendTime = System.currentTimeMillis() - requestTime
                 logger.info("${ColorCode.GREEN}[${requestId}]${ColorCode.BLUE}[Response]${ColorCode.RESET} ${response.statusCode} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
             }
-            .doOnError { error ->
-                val spendTime = System.currentTimeMillis() - requestTime
-                logger.error("${ColorCode.GREEN}[${requestId}]${ColorCode.RED}[Error]${ColorCode.RESET} ${error.message} ${ColorCode.YELLOW}- ${spendTime}ms${ColorCode.RESET}")
-            }
     }
 }
