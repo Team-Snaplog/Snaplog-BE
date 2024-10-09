@@ -17,3 +17,11 @@ listOf(
     include(it)
     project(":$it").projectDir = File("$rootDir/libs/infra/$it")
 }
+
+// apps/api 하위 모듈 세팅
+listOf(
+    "api-all",
+).forEach {
+    include(it)
+    project(":$it").projectDir = File("$rootDir/apps/api/$it")
+}
