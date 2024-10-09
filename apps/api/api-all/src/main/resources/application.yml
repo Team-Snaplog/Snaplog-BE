@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: api-all
+  config:
+    import:
+      - optional:api-core.yml
+      - optional:common.yml
+      - optional:mysql.yml
+      - optional:redis.yml
+
+server:
+  port: 8080
