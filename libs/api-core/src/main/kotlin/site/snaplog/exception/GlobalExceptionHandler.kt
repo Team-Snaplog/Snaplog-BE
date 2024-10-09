@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import site.snaplog.enums.StatusCode
+import site.snaplog.response.SnaplogErrorResponse
 import site.snaplog.util.ColorCode
 
 @Component
@@ -26,18 +27,16 @@ class GlobalExceptionHandler: ErrorWebExceptionHandler {
         val requestId = request.id
 
         val errorResponse = when (ex) {
-            is SnaplogException -> ErrorResponse(ex.statusCode.code, ex.statusCode.message, ex.message)
-            else -> ErrorResponse(StatusCode.INTERNAL_SERVER_ERROR.code, StatusCode.INTERNAL_SERVER_ERROR.message)
+            is SnaplogException -> SnaplogErrorResponse(ex.statusCode.code, ex.statusCode.message, ex.message)
+            else -> SnaplogErrorResponse(StatusCode.INTERNAL_SERVER_ERROR.code, StatusCode.INTERNAL_SERVER_ERROR.message)
         }
 
         response.statusCode = HttpStatus.valueOf(errorResponse.status)
         response.headers.contentType = MediaType.APPLICATION_JSON
 
-        logger.error("${ColorCode.GREEN}[${requestId}]${ColorCode.RED}[Error]${ColorCode.RESET} ${errorResponse.status} ${errorResponse.message} ${errorResponse.detailMessage ?: ""}${ColorCode.RESET}\n${ex.stackTraceToString()}")
+        logger.error("${ColorCode.GREEN}[${requestId}]${ColorCode.RED}[Error]${ColorCode.RESET} ${errorResponse.status} ${errorResponse.message} ${errorResponse.errorDetail ?: ""}${ColorCode.RESET}\n${ex.stackTraceToString()}")
 
         val dataBuffer = response.bufferFactory().wrap(objectMapper.writeValueAsBytes(errorResponse))
         return response.writeWith(Mono.just(dataBuffer))
     }
 }
-
-data class ErrorResponse(val status: Int, val message: String, val detailMessage: String? = null)
