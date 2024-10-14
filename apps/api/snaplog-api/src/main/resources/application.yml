@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api-all
+    name: snaplog-api
   config:
     import:
       - optional:api-core.yml
