@@ -1,12 +1,18 @@
 spring:
   application:
-    name: api-all
+    name: snaplog-api
   config:
     import:
       - optional:api-core.yml
       - optional:common.yml
       - optional:mysql.yml
       - optional:redis.yml
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
 
 server:
   port: 8080
