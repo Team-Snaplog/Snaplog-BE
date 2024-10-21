@@ -1,3 +1,13 @@
 package site.snaplog.dto.auth.request
 
-data class LoginRequestDto()
+import io.swagger.v3.oas.annotations.media.Schema
+import site.snaplog.enums.Provider
+
+@Schema(description = "로그인 요청 DTO")
+data class LoginRequestDto(
+    @field:Schema(description = "OAuth2 Provider")
+    val provider: Provider,
+
+    @field:Schema(description = "Google 및 Apple 로그인 시 발급받은 ID Token", example = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjFiZDY3...")
+    val idToken: String
+)
