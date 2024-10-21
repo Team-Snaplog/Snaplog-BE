@@ -1,4 +1,4 @@
-package site.snaplog.dto.auth.request
+package site.snaplog.domain.auth.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 import site.snaplog.enums.Provider
