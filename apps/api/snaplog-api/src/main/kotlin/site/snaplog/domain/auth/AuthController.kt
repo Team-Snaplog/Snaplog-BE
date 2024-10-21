@@ -2,6 +2,7 @@ package site.snaplog.domain.auth
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,7 +24,7 @@ class AuthController(
         summary = "로그인 Api",
         description = "Google 및 Apple 로그인을 통해 발급 받은 Id Token으로 로그인을 진행하고, AccessToken과 RefreshToken을 발급 받습니다."
     )
-    fun login(@RequestBody loginRequestDto: LoginRequestDto): Mono<LoginResponseDto> {
+    fun login(@RequestBody @Valid loginRequestDto: LoginRequestDto): Mono<LoginResponseDto> {
         return authService.login(loginRequestDto)
     }
 }
