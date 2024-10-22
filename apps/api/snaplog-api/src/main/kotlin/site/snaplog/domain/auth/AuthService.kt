@@ -1,5 +1,6 @@
 package site.snaplog.domain.auth
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import site.snaplog.domain.auth.dto.request.LoginRequestDto
@@ -20,16 +21,22 @@ class AuthService(
     private val appleOAuth2Validator: AppleOAuth2Validator
 ) {
 
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
+
     fun login(loginRequestDto: LoginRequestDto): Mono<LoginResponseDto> {
+        logger.debug("로그인 요청")
         return getEmailFromProvider(loginRequestDto)
             .flatMap { email ->
+                logger.debug("idToken 검증 완료, email: $email")
                 memberRepository.findByEmail(email)
                     .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "가입되지 않은 회원입니다.")))
             }
             .map { memberEntity ->
+                logger.debug("회원 조회 완료, email: ${memberEntity.email}")
                 jwtService.issueTokens(memberEntity.email)
             }
             .map { jwtCache ->
+                logger.debug("토큰 발급 완료")
                 LoginResponseDto(
                     accessToken = jwtCache.accessToken,
                     refreshToken = jwtCache.refreshToken
