@@ -2,5 +2,8 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+  security:
+    user:
+      password: none
 jwt:
   secret: 7e7ozxEFTjhCAvuHjc6l4b8lJJWBd0yB/Vsq5j2E/6qolmuXIgpQMwPh6tODfQDh
