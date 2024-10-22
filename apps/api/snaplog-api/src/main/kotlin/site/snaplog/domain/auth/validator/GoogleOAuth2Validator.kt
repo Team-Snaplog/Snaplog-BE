@@ -25,7 +25,7 @@ class GoogleOAuth2Validator(
         return Mono.fromCallable {
             val verifiedIdToken = googleVerifier.verify(idToken)
                 ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "Google IdToken이 유효하지 않습니다.")
-            verifiedIdToken.payload.email as String
+            verifiedIdToken.payload.email
         }.subscribeOn(Schedulers.boundedElastic())
     }
 }
