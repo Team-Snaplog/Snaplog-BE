@@ -31,8 +31,17 @@ class JwtFilter(
 
         return jwtService.getJwtPayload(accessToken)
             .flatMap { payload ->
-                memberRepository.findByEmail(payload["sub"].toString())
-                    .switchIfEmpty { throw SnaplogException(StatusCode.UNAUTHORIZED, "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다.") }
+                val email = payload["sub"] as String
+
+                jwtService.isBlacklisted(email)
+                    .flatMap { isBlacklisted ->
+                        if (isBlacklisted) {
+                            Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "로그아웃 후 아직 로그인 하지 않은 사용자입니다."))
+                        } else {
+                            memberRepository.findByEmail(email)
+                                .switchIfEmpty { throw SnaplogException(StatusCode.UNAUTHORIZED, "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다.") }
+                        }
+                    }
             }.map { member ->
                 val authentication = UsernamePasswordAuthenticationToken(member, null, emptyList())
                 ReactiveSecurityContextHolder.withAuthentication(authentication)

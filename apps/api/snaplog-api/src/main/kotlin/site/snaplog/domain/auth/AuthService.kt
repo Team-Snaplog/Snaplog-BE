@@ -36,7 +36,9 @@ class AuthService(
                 jwtService.issueTokens(memberEntity.email)
             }
             .map { jwtCache ->
-                logger.debug("토큰 발급 완료")
+                logger.debug("JWT 발급 완료")
+                jwtService.deleteBlacklist(jwtCache.email)
+                logger.debug("해당 회원 블랙리스트 삭제 완료")
                 LoginResponseDto(
                     accessToken = jwtCache.accessToken,
                     refreshToken = jwtCache.refreshToken
