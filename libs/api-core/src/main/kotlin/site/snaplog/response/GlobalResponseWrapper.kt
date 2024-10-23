@@ -1,7 +1,8 @@
 package site.snaplog.response
 
 import org.springframework.http.codec.HttpMessageWriter
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.HandlerResult
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver
 import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler
@@ -21,7 +22,9 @@ class GlobalResponseWrapper(
             return false
         }
 
-        return result.returnTypeSource.declaringClass.isAnnotationPresent(RequestBody::class.java)
+        return result.returnTypeSource.declaringClass.run {
+            isAnnotationPresent(RestController::class.java) || isAnnotationPresent(ResponseBody::class.java)
+        }
     }
 
     override fun handleResult(exchange: ServerWebExchange, result: HandlerResult): Mono<Void> {
