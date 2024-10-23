@@ -3,6 +3,7 @@ package site.snaplog.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
 @Table("picture")
 data class PictureEntity(
@@ -11,4 +12,6 @@ data class PictureEntity(
     @Column("snap_id")
     val snapId: Long,
     val url: String,
+    override val createdAt: LocalDateTime? = null,
+    override val updatedAt: LocalDateTime? = null
 ): BaseEntity()
