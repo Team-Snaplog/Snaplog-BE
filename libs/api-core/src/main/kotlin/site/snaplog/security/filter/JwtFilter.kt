@@ -29,10 +29,11 @@ class JwtFilter(
             ?.substringAfter("Bearer ")
             ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "요청에 AccessToken이 존재하지 않습니다.")
 
-        return jwtService.getJwtPayload(accessToken).map { payload ->
+        return jwtService.getJwtPayload(accessToken)
+            .flatMap { payload ->
                 memberRepository.findByEmail(payload["sub"].toString())
-            }.switchIfEmpty { throw SnaplogException(StatusCode.UNAUTHORIZED, "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다.") }
-            .map { member ->
+                    .switchIfEmpty { throw SnaplogException(StatusCode.UNAUTHORIZED, "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다.") }
+            }.map { member ->
                 val authentication = UsernamePasswordAuthenticationToken(member, null, emptyList())
                 ReactiveSecurityContextHolder.withAuthentication(authentication)
             }.flatMap {
