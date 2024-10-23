@@ -31,7 +31,7 @@ class AuthService(
                 memberAdapter.findMemberByEmail(email)
                     .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "가입되지 않은 회원입니다.")))
             }
-            .map { memberEntity ->
+            .flatMap { memberEntity ->
                 logger.debug("회원 조회 완료, email: ${memberEntity.email}")
                 jwtService.issueTokens(memberEntity.email)
             }

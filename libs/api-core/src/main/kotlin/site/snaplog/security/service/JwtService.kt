@@ -21,7 +21,7 @@ class JwtService(
     @Value("\${jwt.secret}")
     lateinit var secret: String
 
-    fun issueTokens(memberEmail: String): JwtCache {
+    fun issueTokens(memberEmail: String): Mono<JwtCache> {
         val accessToken = createToken(memberEmail, JwtType.ACCESS)
         val refreshToken = createToken(memberEmail, JwtType.REFRESH)
 
