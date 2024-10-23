@@ -7,5 +7,5 @@ import site.snaplog.cache.BlacklistCache
 interface BlacklistCacheRepository: ReactiveCrudRepository<BlacklistCache, String> {
     fun findByEmail(email: String): Mono<BlacklistCache>
 
-    fun deleteByEmail(email: String)
+    fun deleteByEmail(email: String): Mono<Void>
 }

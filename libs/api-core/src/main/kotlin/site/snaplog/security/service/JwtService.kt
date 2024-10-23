@@ -69,13 +69,23 @@ class JwtService(
         }
     }
 
-    fun deleteTokenByEmail(memberEamil: String) {
-        jwtCacheRepository.deleteByEmail(memberEamil)
-    }
-
-    fun saveBlacklist(email: String, expiration: Date) {
-        val duration = expiration.time - Date().time
-        blacklistCacheRepository.save(BlacklistCache(email = email, expiration = duration))
+    fun deleteLogoutTokenByEmail(memberEmail: String): Mono<Void> {
+        return jwtCacheRepository.findByEmail(memberEmail)
+            .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "로그아웃 후 아직 로그인 하지 않은 사용자입니다.")))
+            .flatMap { getJwtPayload(it.accessToken) }
+            .flatMap {
+                val duration = (it["exp"] as Long) * 1000 - Date().time
+                if (duration > 0) {
+                    Mono.zip(
+                        blacklistCacheRepository.save(
+                            BlacklistCache(email = memberEmail, expiration = duration)
+                        ).then(Mono.empty<Void>()),
+                        jwtCacheRepository.deleteByEmail(memberEmail)
+                    ).then()
+                } else {
+                    jwtCacheRepository.deleteByEmail(memberEmail)
+                }
+            }
     }
 
     fun isBlacklisted(email: String): Mono<Boolean> {
