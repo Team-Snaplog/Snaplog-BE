@@ -6,10 +6,9 @@ import org.springframework.data.redis.core.TimeToLive
 import java.util.concurrent.TimeUnit
 
 @RedisHash("jwt-blacklist")
-data class JwtBlacklistCache(
+data class BlacklistCache(
     @Id
     val email: String,
-    val accessToken: String,
 
     @TimeToLive(unit = TimeUnit.MILLISECONDS)
     val expiration: Long
