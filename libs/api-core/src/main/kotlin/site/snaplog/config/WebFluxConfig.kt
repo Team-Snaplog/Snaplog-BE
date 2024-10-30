@@ -7,11 +7,13 @@ import org.springframework.web.reactive.accept.RequestedContentTypeResolver
 import org.springframework.web.reactive.config.WebFluxConfigurer
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer
 import site.snaplog.response.GlobalResponseWrapper
+import site.snaplog.security.resolver.AccessTokenArgumentResolver
 import site.snaplog.security.resolver.LoginMemberArgumentResolver
 
 @Configuration
 class WebFluxConfig(
-    private val loginMemberArgumentResolver: LoginMemberArgumentResolver
+    private val loginMemberArgumentResolver: LoginMemberArgumentResolver,
+    private val accessTokenArgumentResolver: AccessTokenArgumentResolver
 ): WebFluxConfigurer {
 
     @Bean
@@ -24,5 +26,6 @@ class WebFluxConfig(
 
     override fun configureArgumentResolvers(configurer: ArgumentResolverConfigurer) {
         configurer.addCustomResolver(loginMemberArgumentResolver)
+        configurer.addCustomResolver(accessTokenArgumentResolver)
     }
 }

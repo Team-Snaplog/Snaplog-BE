@@ -7,18 +7,14 @@ import org.springframework.web.reactive.BindingContext
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import site.snaplog.entity.MemberEntity
 import site.snaplog.enums.StatusCode
 import site.snaplog.exception.SnaplogException
-import site.snaplog.repository.MemberRepository
 
 @Component
-class LoginMemberArgumentResolver(
-    private val memberRepository: MemberRepository
-) : HandlerMethodArgumentResolver {
+class AccessTokenArgumentResolver: HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
-        return parameter.hasParameterAnnotation(LoginMember::class.java)
+        return parameter.hasParameterAnnotation(AccessToken::class.java)
     }
 
     override fun resolveArgument(
@@ -26,19 +22,20 @@ class LoginMemberArgumentResolver(
         bindingContext: BindingContext,
         exchange: ServerWebExchange
     ): Mono<Any?> {
-        return if (parameter.parameterType == MemberEntity::class.java) {
-            ReactiveSecurityContextHolder.getContext()
-                .map { it.authentication }
-                .map {
-                    it.principal as? MemberEntity
-                        ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "잘못된 인증 정보입니다.")
-                }
+        return if (parameter.parameterType == AccessToken::class.java) {
+            val token = exchange.request.headers.getFirst("Authorization")?.substringAfter("Bearer ")
+            if (token == null) {
+                Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "토큰이 존재하지 않습니다."))
+            } else {
+                ReactiveSecurityContextHolder.getContext()
+                    .map { token }
+            }
         } else {
-            Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "@LoginMember 어노테이션은 MemberEntity 타입만 지원합니다."))
+            Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "@AccessToken 어노테이션은 MemberEntity 타입만 지원합니다."))
         }
     }
 }
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class LoginMember
+annotation class AccessToken
