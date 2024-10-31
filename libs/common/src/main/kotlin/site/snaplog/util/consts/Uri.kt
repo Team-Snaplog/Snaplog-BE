@@ -8,6 +8,7 @@ object Uri {
     const val AUTH = "/auth"
     const val VERIFY_TOKEN = "/verify-token"
     const val LOGIN = "/login"
+    const val LOGOUT = "/logout"
     const val REFRESH = "/refresh"
 
     val passUris = listOf(

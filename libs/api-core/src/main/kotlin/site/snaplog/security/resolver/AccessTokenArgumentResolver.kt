@@ -22,7 +22,7 @@ class AccessTokenArgumentResolver: HandlerMethodArgumentResolver {
         bindingContext: BindingContext,
         exchange: ServerWebExchange
     ): Mono<Any?> {
-        return if (parameter.parameterType == AccessToken::class.java) {
+        return if (parameter.parameterType == String::class.java) {
             val token = exchange.request.headers.getFirst("Authorization")?.substringAfter("Bearer ")
             if (token == null) {
                 Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "토큰이 존재하지 않습니다."))

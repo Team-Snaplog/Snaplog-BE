@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono
 import site.snaplog.domain.auth.dto.request.LoginRequestDto
 import site.snaplog.domain.auth.dto.response.LoginResponseDto
 import site.snaplog.entity.MemberEntity
+import site.snaplog.security.resolver.AccessToken
 import site.snaplog.security.resolver.LoginMember
 import site.snaplog.util.consts.Uri
 
@@ -38,5 +39,14 @@ class AuthController(
     )
     fun login(@RequestBody @Valid loginRequestDto: LoginRequestDto): Mono<LoginResponseDto> {
         return authService.login(loginRequestDto)
+    }
+
+    @PostMapping(Uri.LOGOUT)
+    @Operation(
+        summary = "로그아웃 Api",
+        description = "AccessToken을 블랙리스트에 추가하여 로그아웃을 진행합니다."
+    )
+    fun logout(@LoginMember loginMember: MemberEntity, @AccessToken accessToken: String) {
+        authService.logout(loginMember, accessToken)
     }
 }

@@ -8,6 +8,7 @@ import site.snaplog.domain.auth.dto.request.LoginRequestDto
 import site.snaplog.domain.auth.dto.response.LoginResponseDto
 import site.snaplog.domain.auth.validator.AppleOAuth2Validator
 import site.snaplog.domain.auth.validator.GoogleOAuth2Validator
+import site.snaplog.entity.MemberEntity
 import site.snaplog.enums.Provider
 import site.snaplog.enums.StatusCode
 import site.snaplog.exception.SnaplogException
@@ -51,5 +52,11 @@ class AuthService(
             Provider.GOOGLE -> googleOAuth2Validator.validate(loginRequestDto.idToken)
             Provider.APPLE -> appleOAuth2Validator.validate(loginRequestDto.idToken)
         }
+    }
+
+    fun logout(loginMember: MemberEntity, accessToken: String) {
+        logger.debug("로그아웃 요청")
+        println("loginMember: $loginMember")
+        println("accessToken: $accessToken")
     }
 }
