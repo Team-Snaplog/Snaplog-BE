@@ -78,12 +78,13 @@ class JwtService(
                 if (duration > 0) {
                     Mono.zip(
                         blacklistCacheRepository.save(
-                            BlacklistCache(email = memberEmail, expiration = duration)
+                            BlacklistCache(email = memberEmail)
                         ).then(Mono.empty<Void>()),
                         jwtCacheRepository.deleteByEmail(memberEmail)
                     ).then()
                 } else {
                     jwtCacheRepository.deleteByEmail(memberEmail)
+                        .then()
                 }
             }
     }
