@@ -31,6 +31,7 @@ class GlobalResponseWrapper(
         val body = when (val value = result.returnValue) {
             is Mono<*> -> value
             is Flux<*> -> value.collectList()
+            null -> Mono.empty()
             else -> throw SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "반환 타입은 Mono 또는 Flux만 지원합니다.")
         }.map {
             SnaplogResponse(
@@ -38,7 +39,13 @@ class GlobalResponseWrapper(
                 message = "Success",
                 data = it
             )
-        }
+        }.defaultIfEmpty(
+            SnaplogResponse(
+                status = 200,
+                message = "Success",
+                data = null
+            )
+        )
 
         val returnTypeSource = result.returnTypeSource
 
