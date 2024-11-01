@@ -55,8 +55,20 @@ class AuthService(
     }
 
     fun logout(loginMember: MemberEntity, accessToken: String) {
-        logger.debug("로그아웃 요청")
-        println("loginMember: $loginMember")
-        println("accessToken: $accessToken")
+        jwtService.getJwtPayload(accessToken)
+            .flatMap { jwtPayload ->
+                if (loginMember.email != jwtPayload["sub"]) {
+                    Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "토큰의 소유자가 아닙니다."))
+                } else {
+                    Mono.just(jwtPayload)
+                }
+            }
+            .map { jwtPayload ->
+                jwtService.deleteJwtCache(loginMember.email)
+                jwtPayload["exp"] as Long - System.currentTimeMillis()
+            }
+            .flatMap { durationMillis ->
+                jwtService.saveBlacklist(loginMember.email, durationMillis)
+            }
     }
 }

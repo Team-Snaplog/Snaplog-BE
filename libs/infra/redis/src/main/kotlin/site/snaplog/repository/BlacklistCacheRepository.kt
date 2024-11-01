@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import site.snaplog.cache.BlacklistCache
+import java.time.Duration
 
 @Repository
 class BlacklistCacheRepository(
@@ -14,9 +15,13 @@ class BlacklistCacheRepository(
 
     private val prefix = "blacklist:"
 
-    fun save(blacklistCache: BlacklistCache): Mono<BlacklistCache> {
+    fun save(blacklistCache: BlacklistCache, durationMillis: Long): Mono<BlacklistCache> {
+        val duration = Duration.ofMillis(durationMillis)
         return redisTemplate.opsForValue()
             .set("$prefix${blacklistCache.email}", objectMapper.writeValueAsString(blacklistCache))
+            .flatMap {
+                redisTemplate.expire("$prefix${blacklistCache.email}", duration)
+            }
             .map { blacklistCache }
     }
 
