@@ -24,12 +24,13 @@ class JwtService(
     @Value("\${jwt.secret}")
     lateinit var secret: String
 
-    fun issueTokens(memberEmail: String): Mono<JwtCache> {
+    fun issueTokens(memberEmail: String): Mono<Pair<String, String>> {
         val accessToken = createToken(memberEmail, JwtType.ACCESS)
         val refreshToken = createToken(memberEmail, JwtType.REFRESH)
 
-        val jwt = JwtCache(email = memberEmail, accessToken = accessToken, refreshToken = refreshToken)
+        val jwt = JwtCache(email = memberEmail, refreshToken = refreshToken)
         return jwtCacheRepository.save(jwt)
+            .map { accessToken to refreshToken }
     }
 
     fun createToken(memberEmail: String, jwtType: JwtType): String {
@@ -69,6 +70,10 @@ class JwtService(
         }
     }
 
+    fun findJwtCacheByEmail(email: String): Mono<JwtCache> {
+        return jwtCacheRepository.findByEmail(email)
+    }
+
     fun deleteJwtCache(email: String): Mono<Boolean> {
         return jwtCacheRepository.deleteByEmail(email)
     }
@@ -84,7 +89,7 @@ class JwtService(
             .switchIfEmpty(Mono.just(false))
     }
 
-    fun deleteBlacklist(email: String) {
-        blacklistCacheRepository.deleteByEmail(email)
+    fun deleteBlacklist(email: String):  Mono<Boolean> {
+        return blacklistCacheRepository.deleteByEmail(email)
     }
 }

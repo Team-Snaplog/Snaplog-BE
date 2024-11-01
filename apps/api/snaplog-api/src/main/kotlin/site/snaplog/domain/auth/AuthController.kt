@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 import site.snaplog.domain.auth.dto.request.LoginRequestDto
+import site.snaplog.domain.auth.dto.request.RefreshRequestDto
 import site.snaplog.domain.auth.dto.response.LoginResponseDto
 import site.snaplog.entity.MemberEntity
 import site.snaplog.security.resolver.AccessToken
@@ -48,5 +49,14 @@ class AuthController(
     )
     fun logout(@LoginMember loginMember: MemberEntity, @AccessToken accessToken: String) {
         authService.logout(loginMember, accessToken)
+    }
+
+    @PostMapping(Uri.REFRESH)
+    @Operation(
+        summary = "토큰 재발급 Api",
+        description = "RefreshToken을 통해 유효성을 검증한 후 AccessToken과 RefreshToken을 재발급 받습니다.",
+    )
+    fun refresh(@LoginMember loginMember: MemberEntity, @RequestBody @Valid refreshRequestDto: RefreshRequestDto): Mono<LoginResponseDto> {
+        return authService.refresh(loginMember, refreshRequestDto)
     }
 }
