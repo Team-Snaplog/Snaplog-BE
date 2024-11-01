@@ -22,10 +22,13 @@ class GoogleOAuth2Validator(
     }
 
     override fun validate(idToken: String): Mono<String> {
-        return Mono.fromCallable {
-            val verifiedIdToken = googleVerifier.verify(idToken)
-                ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "Google IdToken이 유효하지 않습니다.")
-            verifiedIdToken.payload.email
-        }.subscribeOn(Schedulers.boundedElastic())
+        return Mono.justOrEmpty(googleVerifier.verify(idToken))
+            .switchIfEmpty(
+                Mono.error(
+                    SnaplogException(StatusCode.UNAUTHORIZED, "Google IdToken이 유효하지 않습니다.")
+                )
+            )
+            .map { verifiedIdToken -> verifiedIdToken.payload.email }
+            .subscribeOn(Schedulers.boundedElastic())
     }
 }

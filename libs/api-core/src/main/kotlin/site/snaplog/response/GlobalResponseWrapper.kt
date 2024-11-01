@@ -32,7 +32,7 @@ class GlobalResponseWrapper(
             is Mono<*> -> value
             is Flux<*> -> value.collectList()
             null -> Mono.empty()
-            else -> throw SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "반환 타입은 Mono 또는 Flux만 지원합니다.")
+            else -> Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "반환 타입은 Mono 또는 Flux만 지원합니다."))
         }.map {
             SnaplogResponse(
                 status = 200,

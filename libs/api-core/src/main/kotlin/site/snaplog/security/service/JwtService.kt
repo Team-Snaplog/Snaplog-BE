@@ -52,22 +52,25 @@ class JwtService(
 
     fun getJwtPayload(token: String): Mono<Map<String, *>> {
         return Mono.fromCallable {
-            try {
-                val payload = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(secret.toByteArray()))
-                    .build()
-                    .parseSignedClaims(token)
-                    .payload
-
-                if (!payload.expiration.after(Date())) {
-                    throw SnaplogException(StatusCode.UNAUTHORIZED, "만료된 JWT입니다.")
-                }
-
-                payload as Map<String, *>
-            } catch (e: JwtException) {
-                throw SnaplogException(StatusCode.UNAUTHORIZED, "유효하지 않은 JWT입니다.")
-            }
+            Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secret.toByteArray()))
+                .build()
+                .parseSignedClaims(token)
+                .payload
         }
+            .onErrorMap { e ->
+                when (e) {
+                    is JwtException -> SnaplogException(StatusCode.UNAUTHORIZED, "유효하지 않은 JWT입니다.")
+                    else -> e
+                }
+            }
+            .flatMap { payload ->
+                if (!payload.expiration.after(Date())) {
+                    Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "만료된 JWT입니다."))
+                } else {
+                    Mono.just(payload as Map<String, *>)
+                }
+            }
     }
 
     fun findJwtCacheByEmail(email: String): Mono<JwtCache> {

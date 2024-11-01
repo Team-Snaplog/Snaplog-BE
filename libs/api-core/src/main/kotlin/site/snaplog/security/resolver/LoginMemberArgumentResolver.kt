@@ -29,9 +29,13 @@ class LoginMemberArgumentResolver(
         return if (parameter.parameterType == MemberEntity::class.java) {
             ReactiveSecurityContextHolder.getContext()
                 .map { it.authentication }
-                .map {
-                    it.principal as? MemberEntity
-                        ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "잘못된 인증 정보입니다.")
+                .flatMap { authentication ->
+                    when (val principal = authentication.principal) {
+                        is MemberEntity -> Mono.just(principal)
+                        else -> Mono.error(
+                            SnaplogException(StatusCode.UNAUTHORIZED, "잘못된 인증 정보입니다.")
+                        )
+                    }
                 }
         } else {
             Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "@LoginMember 어노테이션은 MemberEntity 타입만 지원합니다."))

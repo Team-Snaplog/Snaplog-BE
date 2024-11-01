@@ -30,48 +30,75 @@ class AppleOAuth2Validator(
         return webClient.get()
             .uri(APPLE_PUBLIC_KEYS_URL)
             .retrieve()
+            .onStatus(
+                { status -> status.isError },
+                {
+                    Mono.error(
+                        SnaplogException(
+                            StatusCode.UNAUTHORIZED,
+                            "Apple 공개키 조회 실패"
+                        )
+                    )
+                }
+            )
             .bodyToMono(Map::class.java)
             .map { it["keys"] as List<*> }
             .map { it.map { key -> key as Map<*, *> } }
     }
 
     private fun validateToken(idToken: String, publicKeys: List<Map<*, *>>): Mono<String> {
-        return Mono.fromCallable {
-            val signedJWT = SignedJWT.parse(idToken)
-            val kid = signedJWT.header.keyID
-
-            val publicKey = findMatchingPublicKey(publicKeys, kid)
-            validateSignature(signedJWT, publicKey)
-
-            extractEmail(signedJWT)
-        }
+        val signedJWT = SignedJWT.parse(idToken)
+        val kid = signedJWT.header.keyID
+        return findMatchingPublicKey(publicKeys, kid)
+            .flatMap { rsaKey ->
+                validateSignature(SignedJWT.parse(idToken), rsaKey)
+            }
+            .flatMap {
+                extractEmail(signedJWT)
+            }
     }
 
-    private fun findMatchingPublicKey(publicKeys: List<Map<*, *>>, kid: String): RSAKey {
-        val keyData = publicKeys.find { it["kid"] == kid }
-            ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "Apple IdToken이 유효하지 않아 회원 정보를 가져올 수 없습니다.")
-
-        return RSAKey.Builder(
-            Base64URL(keyData["n"] as String),
-            Base64URL(keyData["e"] as String)
-        ).build()
-    }
-
-    private fun validateSignature(signedJWT: SignedJWT, rsaKey: RSAKey) {
-        val verifier = RSASSAVerifier(rsaKey)
-        if (!signedJWT.verify(verifier)) {
-            throw SnaplogException(
-                StatusCode.UNAUTHORIZED,
-                "Apple IdToken이 유효하지 않아 회원 정보를 가져올 수 없습니다."
+    private fun findMatchingPublicKey(publicKeys: List<Map<*, *>>, kid: String): Mono<RSAKey> {
+        return Mono.justOrEmpty(publicKeys.find { it["kid"] == kid })
+            .switchIfEmpty(
+                Mono.error(
+                    SnaplogException(
+                        StatusCode.UNAUTHORIZED,
+                        "Apple IdToken이 유효하지 않아 회원 정보를 가져올 수 없습니다."
+                    )
+                )
             )
+            .map { keyData ->
+                RSAKey.Builder(
+                    Base64URL(keyData["n"] as String),
+                    Base64URL(keyData["e"] as String)
+                ).build()
+            }
+    }
+
+    private fun validateSignature(signedJWT: SignedJWT, rsaKey: RSAKey): Mono<Unit> {
+        val verifier = RSASSAVerifier(rsaKey)
+        return if (!signedJWT.verify(verifier)) {
+            Mono.error(
+                SnaplogException(
+                    StatusCode.UNAUTHORIZED,
+                    "Apple IdToken이 유효하지 않아 회원 정보를 가져올 수 없습니다."
+                )
+            )
+        } else {
+            Mono.empty()
         }
     }
 
-    private fun extractEmail(signedJWT: SignedJWT): String {
-        return signedJWT.jwtClaimsSet.getStringClaim("email")
-            ?: throw SnaplogException(
-                StatusCode.UNAUTHORIZED,
-                "Apple IdToken에서 이메일을 찾을 수 없습니다."
+    private fun extractEmail(signedJWT: SignedJWT): Mono<String> {
+        return Mono.justOrEmpty(signedJWT.jwtClaimsSet.getStringClaim("email"))
+            .switchIfEmpty(
+                Mono.error(
+                    SnaplogException(
+                        StatusCode.UNAUTHORIZED,
+                        "Apple IdToken에서 이메일을 찾을 수 없습니다."
+                    )
+                )
             )
     }
 }
