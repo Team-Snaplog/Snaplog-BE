@@ -65,10 +65,14 @@ class AuthService(
             }
             .map { jwtPayload ->
                 jwtService.deleteJwtCache(loginMember.email)
+                logger.debug("해당 회원 JWT 캐시 정보 삭제 완료")
                 jwtPayload["exp"] as Long - System.currentTimeMillis()
             }
             .flatMap { durationMillis ->
                 jwtService.saveBlacklist(loginMember.email, durationMillis)
+            }
+            .subscribe {
+                logger.debug("해당 회원 블랙리스트 추가 완료")
             }
     }
 }
