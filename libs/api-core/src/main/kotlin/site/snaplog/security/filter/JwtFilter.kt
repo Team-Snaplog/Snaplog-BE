@@ -25,18 +25,49 @@ class JwtFilter(
             return chain.filter(exchange)
         }
 
-        val accessToken = exchange.request.headers.getFirst("Authorization")
-            ?.substringAfter("Bearer ")
-            ?: throw SnaplogException(StatusCode.UNAUTHORIZED, "요청에 AccessToken이 존재하지 않습니다.")
+        return Mono.justOrEmpty(
+            exchange.request.headers.getFirst("Authorization")
+                ?.substringAfter("Bearer ")
+        )
+            .switchIfEmpty(
+                Mono.error(
+                    SnaplogException(StatusCode.UNAUTHORIZED, "요청에 AccessToken이 존재하지 않습니다.")
+                )
+            )
+            .flatMap { accessToken ->
+                jwtService.getJwtPayload(accessToken)
+            }
+            .flatMap { payload ->
+                val email = payload["sub"] as String
 
-        return jwtService.getJwtPayload(accessToken).map { payload ->
-                memberRepository.findByEmail(payload["sub"].toString())
-            }.switchIfEmpty { throw SnaplogException(StatusCode.UNAUTHORIZED, "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다.") }
+                jwtService.isBlacklisted(email)
+                    .flatMap { isBlacklisted ->
+                        if (isBlacklisted) {
+                            Mono.error(
+                                SnaplogException(
+                                    StatusCode.UNAUTHORIZED,
+                                    "로그아웃 후 아직 로그인 하지 않은 사용자입니다."
+                                )
+                            )
+                        } else {
+                            memberRepository.findByEmail(email)
+                                .switchIfEmpty(
+                                    Mono.error(
+                                        SnaplogException(
+                                            StatusCode.UNAUTHORIZED,
+                                            "JWT에 등록된 Email로 조회되는 회원이 존재하지 않습니다."
+                                        )
+                                    )
+                                )
+                        }
+                    }
+            }
             .map { member ->
                 val authentication = UsernamePasswordAuthenticationToken(member, null, emptyList())
                 ReactiveSecurityContextHolder.withAuthentication(authentication)
-            }.flatMap {
-                chain.filter(exchange).contextWrite(it)
+            }
+            .flatMap { context ->
+                chain.filter(exchange).contextWrite(context)
             }
     }
 

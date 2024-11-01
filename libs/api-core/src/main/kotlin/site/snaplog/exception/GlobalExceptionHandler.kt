@@ -8,7 +8,10 @@ import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.validation.BindException
+import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 import site.snaplog.enums.StatusCode
 import site.snaplog.response.SnaplogErrorResponse
@@ -28,6 +31,8 @@ class GlobalExceptionHandler: ErrorWebExceptionHandler {
 
         val errorResponse = when (ex) {
             is SnaplogException -> SnaplogErrorResponse(ex.statusCode.code, ex.statusCode.message, ex.message)
+            is WebExchangeBindException -> SnaplogErrorResponse(StatusCode.BAD_REQUEST.code, StatusCode.BAD_REQUEST.message, ex.bindingResult.allErrors.joinToString { it.defaultMessage ?: "" })
+            is ServerWebInputException -> SnaplogErrorResponse(StatusCode.BAD_REQUEST.code, StatusCode.BAD_REQUEST.message, "요청 데이터 형식이 올바르지 않습니다.")
             else -> SnaplogErrorResponse(StatusCode.INTERNAL_SERVER_ERROR.code, StatusCode.INTERNAL_SERVER_ERROR.message)
         }
 

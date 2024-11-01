@@ -41,6 +41,7 @@ class RedisConfig {
     }
 
     @Bean
+    @Primary
     fun reactiveRedisTemplate(factory: ReactiveRedisConnectionFactory): ReactiveRedisTemplate<String, String> {
         val serializer = StringRedisSerializer()
         val jackson2JsonRedisSerializer = Jackson2JsonRedisSerializer(String::class.java)

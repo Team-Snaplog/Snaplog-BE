@@ -13,6 +13,7 @@ listOf(
 listOf(
     "mysql",
     "redis",
+    "http"
 ).forEach {
     include(it)
     project(":$it").projectDir = File("$rootDir/libs/infra/$it")

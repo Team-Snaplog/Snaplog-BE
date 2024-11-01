@@ -14,5 +14,10 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 
+oauth2:
+  ios:
+    google:
+      client-id: testtest  # TODO: 실제 값 Jasypt로 암호화 후 설정
+
 server:
   port: 8080

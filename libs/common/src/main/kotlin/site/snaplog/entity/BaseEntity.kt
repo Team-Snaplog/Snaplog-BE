@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 open class BaseEntity(
     @CreatedDate
     @Column("created_at")
-    val createdAt: LocalDateTime? = null,
+    open val createdAt: LocalDateTime? = null,
 
     @LastModifiedDate
     @Column("updated_at")
-    val updatedAt: LocalDateTime? = null
+    open val updatedAt: LocalDateTime? = null
 )
