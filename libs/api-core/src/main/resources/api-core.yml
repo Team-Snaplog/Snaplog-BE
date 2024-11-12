@@ -5,5 +5,6 @@ spring:
   security:
     user:
       password: none
+
 jwt:
   secret: 7e7ozxEFTjhCAvuHjc6l4b8lJJWBd0yB/Vsq5j2E/6qolmuXIgpQMwPh6tODfQDh  # TODO: 실제 값 Jasypt로 암호화 후 설정

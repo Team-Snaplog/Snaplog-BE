@@ -11,6 +11,8 @@ object Uri {
     const val LOGOUT = "/logout"
     const val REFRESH = "/refresh"
 
+    const val TOPICS = "/topics"
+
     val passUris = listOf(
         API_DOCS,
         WEBJARS + "/**",

@@ -7,7 +7,6 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
 import site.snaplog.enums.StatusCode
 import site.snaplog.exception.SnaplogException
 import site.snaplog.repository.MemberRepository

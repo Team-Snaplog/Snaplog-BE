@@ -1,10 +1,10 @@
-package site.snaplog.adapter
+package site.snaplog.adaptor
 
 import org.springframework.stereotype.Component
 import site.snaplog.repository.MemberRepository
 
 @Component
-class MemberAdapter(
+class MemberAdaptor(
     private val memberRepository: MemberRepository
 ) {
 
