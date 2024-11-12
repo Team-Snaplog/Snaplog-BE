@@ -16,12 +16,12 @@ class BlacklistCacheRepository(
     private val prefix = "blacklist:"
 
     fun save(blacklistCache: BlacklistCache, durationMillis: Long): Mono<BlacklistCache> {
-        val duration = Duration.ofMillis(durationMillis)
         return redisTemplate.opsForValue()
-            .set("$prefix${blacklistCache.email}", objectMapper.writeValueAsString(blacklistCache))
-            .flatMap {
-                redisTemplate.expire("$prefix${blacklistCache.email}", duration)
-            }
+            .set(
+                "$prefix${blacklistCache.email}",
+                objectMapper.writeValueAsString(blacklistCache),
+                Duration.ofMillis(durationMillis)
+            )
             .map { blacklistCache }
     }
 
