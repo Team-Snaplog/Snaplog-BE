@@ -10,8 +10,8 @@ import java.time.LocalDateTime
 data class SnapEntity(
     @Id
     val id: Long? = null,
-    @Column("subject_id")
-    val subjectId: Long,
+    @Column("topic_id")
+    val topicId: Long,
     val content: String,
     @Column("snap_at")
     val snapAt: LocalDate,

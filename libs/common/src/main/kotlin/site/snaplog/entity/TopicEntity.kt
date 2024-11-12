@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
 @Table("subject")
-data class SubjectEntity(
+data class TopicEntity(
     @Id
     val id: Long? = null,
     @Column("member_id")
