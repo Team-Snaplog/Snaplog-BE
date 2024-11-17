@@ -3,7 +3,6 @@ package site.snaplog.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
-import java.time.LocalDateTime
 
 @Table("topic")
 data class TopicEntity(
@@ -12,7 +11,5 @@ data class TopicEntity(
     @Column("member_id")
     val memberId: Long,
     val name: String,
-    val emoji: String,
-    override val createdAt: LocalDateTime? = null,
-    override val updatedAt: LocalDateTime? = null
+    val emoji: String
 ): BaseEntity()

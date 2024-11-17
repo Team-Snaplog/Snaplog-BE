@@ -3,14 +3,18 @@ package site.snaplog.entity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-open class BaseEntity(
+@Table
+abstract class BaseEntity {
     @CreatedDate
     @Column("created_at")
-    open val createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime? = null
+        private set
 
     @LastModifiedDate
     @Column("updated_at")
-    open val updatedAt: LocalDateTime? = null
-)
+    var updatedAt: LocalDateTime? = null
+        private set
+}
