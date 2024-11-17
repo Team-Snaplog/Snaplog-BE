@@ -35,11 +35,6 @@ class AuthService(
             }
             .flatMap { memberEntity ->
                 logger.debug("회원 조회 완료, email: ${memberEntity.email}")
-                jwtService.deleteBlacklist(memberEntity.email)
-                    .thenReturn(memberEntity)
-            }
-            .flatMap { memberEntity ->
-                logger.debug("블랙리스트 삭제 완료, email: ${memberEntity.email}")
                 jwtService.issueTokens(memberEntity.email)
             }
             .map { jwtPair ->
@@ -71,10 +66,6 @@ class AuthService(
                 jwtService.deleteJwtCache(loginMember.email)
                     .doOnSuccess { logger.debug("해당 회원 JWT 캐시 정보 삭제 완료") }
                     .thenReturn(jwtPayload["exp"] as Long - System.currentTimeMillis())
-            }
-            .flatMap { durationMillis ->
-                jwtService.saveBlacklist(loginMember.email, durationMillis)
-                    .doOnSuccess { logger.debug("블랙리스트 저장 완료") }
             }
             .then()
     }
