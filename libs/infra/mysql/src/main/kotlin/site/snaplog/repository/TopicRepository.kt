@@ -5,8 +5,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import site.snaplog.entity.TopicEntity
 
-interface TopicRepository: R2dbcRepository<TopicEntity, Long> {
+interface TopicRepository: R2dbcRepository<TopicEntity, String> {
 
-    fun findAllByMemberId(memberId: Long): Flux<TopicEntity>
-    fun findByMemberIdAndName(id: Long, name: String): Mono<TopicEntity>
+    fun findAllByMemberId(memberId: String): Flux<TopicEntity>
+    fun findByMemberIdAndName(id: String, name: String): Mono<TopicEntity>
 }

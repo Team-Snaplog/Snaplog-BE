@@ -3,12 +3,13 @@ package site.snaplog.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
+import java.util.*
 
 @Table("picture")
 data class PictureEntity(
     @Id
-    val id: Long? = null,
+    val id: String = UUID.randomUUID().toString().replace("-", ""),
     @Column("snap_id")
-    val snapId: Long,
+    val snapId: String,
     val url: String,
 ): BaseEntity()

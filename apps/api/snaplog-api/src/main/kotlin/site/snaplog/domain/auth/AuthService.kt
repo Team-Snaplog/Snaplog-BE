@@ -31,7 +31,10 @@ class AuthService(
             .flatMap { email ->
                 logger.debug("idToken 검증 완료, email: $email")
                 memberAdaptor.findMemberByEmail(email)
-                    .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "가입되지 않은 회원입니다.")))
+                    .switchIfEmpty(Mono.defer {
+                        logger.debug("회원 정보가 존재하지 않음, 회원 생성")
+                        memberAdaptor.save(MemberEntity(email = email, provider = loginRequestDto.provider))
+                    })
             }
             .flatMap { memberEntity ->
                 logger.debug("회원 조회 완료, email: ${memberEntity.email}")

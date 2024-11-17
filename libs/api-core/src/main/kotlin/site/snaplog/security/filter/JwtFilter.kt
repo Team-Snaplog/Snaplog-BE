@@ -9,7 +9,6 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import site.snaplog.enums.StatusCode
 import site.snaplog.exception.SnaplogException
-import site.snaplog.repository.MemberRepository
 import site.snaplog.security.service.JwtService
 import site.snaplog.util.consts.Uri
 
