@@ -3,11 +3,7 @@ package site.snaplog.domain.topic
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import site.snaplog.domain.topic.dto.request.CreateTopicRequestDto
@@ -39,5 +35,14 @@ class TopicController(
     )
     fun createTopic(@LoginMember loginMember: MemberEntity, @RequestBody @Valid createTopicRequestDto: CreateTopicRequestDto): Mono<TopicEntity> {
         return topicService.createTopic(loginMember, createTopicRequestDto)
+    }
+
+    @DeleteMapping("/{topicId}")
+    @Operation(
+        summary = "주제 삭제 Api",
+        description = "주제를 삭제합니다."
+    )
+    fun deleteTopic(@LoginMember loginMember: MemberEntity, @PathVariable topicId: String) {
+        topicService.deleteTopic(topicId)
     }
 }

@@ -16,12 +16,16 @@ class TopicService(
 ) {
 
     fun getTopics(loginMember: MemberEntity): Flux<TopicEntity> {
-        return topicAdaptor.findAllByMemberId(loginMember.id!!)
+        return topicAdaptor.findAllByMemberId(loginMember.id)
     }
 
     fun createTopic(loginMember: MemberEntity, createTopicRequestDto: CreateTopicRequestDto): Mono<TopicEntity> {
-        return topicAdaptor.findByTopicName(loginMember.id!!, createTopicRequestDto.name)
+        return topicAdaptor.findByTopicName(loginMember.id, createTopicRequestDto.name)
             .flatMap { Mono.error<TopicEntity>(SnaplogException(statusCode = StatusCode.CONFLICT, "같은 이름의 주제가 이미 존재합니다.")) }
-            .switchIfEmpty(topicAdaptor.save(loginMember.id!!, createTopicRequestDto))
+            .switchIfEmpty(topicAdaptor.save(loginMember.id, createTopicRequestDto))
+    }
+
+    fun deleteTopic(topicId: String) {
+        topicAdaptor.delete(topicId)
     }
 }

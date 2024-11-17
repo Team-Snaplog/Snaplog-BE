@@ -25,4 +25,8 @@ class TopicAdaptor(
             )
         ).flatMap { r2dbcEntityTemplate.insert(it) }
     }
+
+    fun delete(topicId: String) {
+        topicRepository.deleteById(topicId)
+    }
 }
