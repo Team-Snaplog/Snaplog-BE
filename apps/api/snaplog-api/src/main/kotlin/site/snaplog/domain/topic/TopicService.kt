@@ -5,10 +5,9 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import site.snaplog.adaptor.TopicAdaptor
 import site.snaplog.domain.topic.dto.request.CreateTopicRequestDto
+import site.snaplog.domain.topic.dto.request.UpdateTopicRequestDto
 import site.snaplog.entity.MemberEntity
 import site.snaplog.entity.TopicEntity
-import site.snaplog.enums.StatusCode
-import site.snaplog.exception.SnaplogException
 
 @Service
 class TopicService(
@@ -20,13 +19,15 @@ class TopicService(
     }
 
     fun createTopic(loginMember: MemberEntity, createTopicRequestDto: CreateTopicRequestDto): Mono<TopicEntity> {
-        return topicAdaptor.findByTopicName(loginMember.id, createTopicRequestDto.name)
-            .flatMap { Mono.error<TopicEntity>(SnaplogException(statusCode = StatusCode.CONFLICT, "같은 이름의 주제가 이미 존재합니다.")) }
-            .switchIfEmpty(topicAdaptor.save(loginMember.id, createTopicRequestDto))
+        return topicAdaptor.save(loginMember.id, createTopicRequestDto)
     }
 
     fun deleteTopic(topicId: String): Mono<Boolean> {
         return topicAdaptor.delete(topicId)
             .map { true }
+    }
+
+    fun updateTopic(topicId: String, updateTopicRequestDto: UpdateTopicRequestDto): Mono<TopicEntity> {
+        return topicAdaptor.update(topicId, updateTopicRequestDto)
     }
 }

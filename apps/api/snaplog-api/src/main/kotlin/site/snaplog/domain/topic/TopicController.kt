@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import site.snaplog.domain.topic.dto.request.CreateTopicRequestDto
+import site.snaplog.domain.topic.dto.request.UpdateTopicRequestDto
 import site.snaplog.entity.MemberEntity
 import site.snaplog.entity.TopicEntity
 import site.snaplog.security.resolver.LoginMember
@@ -35,6 +36,15 @@ class TopicController(
     )
     fun createTopic(@LoginMember loginMember: MemberEntity, @RequestBody @Valid createTopicRequestDto: CreateTopicRequestDto): Mono<TopicEntity> {
         return topicService.createTopic(loginMember, createTopicRequestDto)
+    }
+
+    @PatchMapping("/{topicId}")
+    @Operation(
+        summary = "주제 수정 Api",
+        description = "주제를 수정합니다."
+    )
+    fun updateTopic(@LoginMember loginMember: MemberEntity, @PathVariable topicId: String, @RequestBody @Valid updateTopicRequestDto: UpdateTopicRequestDto): Mono<TopicEntity> {
+        return topicService.updateTopic(topicId, updateTopicRequestDto)
     }
 
     @DeleteMapping("/{topicId}")
