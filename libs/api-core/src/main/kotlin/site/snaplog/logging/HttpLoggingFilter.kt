@@ -13,9 +13,9 @@ import site.snaplog.util.consts.ColorCode
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-class LoggingFilter: WebFilter {
+class HttpLoggingFilter: WebFilter {
 
-    private val logger: Logger = LoggerFactory.getLogger(LoggingFilter::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(HttpLoggingFilter::class.java)
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val request = exchange.request

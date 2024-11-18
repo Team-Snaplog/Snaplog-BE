@@ -25,7 +25,8 @@ class TopicService(
             .switchIfEmpty(topicAdaptor.save(loginMember.id, createTopicRequestDto))
     }
 
-    fun deleteTopic(topicId: String) {
-        topicAdaptor.delete(topicId)
+    fun deleteTopic(topicId: String): Mono<Boolean> {
+        return topicAdaptor.delete(topicId)
+            .map { true }
     }
 }

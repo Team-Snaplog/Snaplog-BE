@@ -42,7 +42,7 @@ class TopicController(
         summary = "주제 삭제 Api",
         description = "주제를 삭제합니다."
     )
-    fun deleteTopic(@LoginMember loginMember: MemberEntity, @PathVariable topicId: String) {
-        topicService.deleteTopic(topicId)
+    fun deleteTopic(@LoginMember loginMember: MemberEntity, @PathVariable topicId: String): Mono<Boolean> {
+        return topicService.deleteTopic(topicId)
     }
 }

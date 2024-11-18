@@ -26,7 +26,7 @@ class TopicAdaptor(
         ).flatMap { r2dbcEntityTemplate.insert(it) }
     }
 
-    fun delete(topicId: String) {
-        topicRepository.deleteById(topicId)
+    fun delete(topicId: String): Mono<Void> {
+        return topicRepository.deleteById(topicId)
     }
 }
