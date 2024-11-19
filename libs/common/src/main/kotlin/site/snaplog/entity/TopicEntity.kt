@@ -8,15 +8,17 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 import java.util.*
 
-@Table("picture")
-data class PictureEntity(
+@Table("topic")
+data class TopicEntity(
     @Id
     val id: String = UUID.randomUUID().toString().replace("-", ""),
 
-    @Column("snap_id")
-    val snapId: String,
+    @Column("member_id")
+    val memberId: String,
 
-    val url: String,
+    val name: String,
+
+    val emoji: String,
 
     @CreatedDate
     @Column("created_at")

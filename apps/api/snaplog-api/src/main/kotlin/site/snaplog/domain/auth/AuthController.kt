@@ -47,8 +47,8 @@ class AuthController(
         summary = "로그아웃 Api",
         description = "AccessToken을 블랙리스트에 추가하여 로그아웃을 진행합니다."
     )
-    fun logout(@LoginMember loginMember: MemberEntity, @AccessToken accessToken: String) {
-        authService.logout(loginMember, accessToken)
+    fun logout(@LoginMember loginMember: MemberEntity, @AccessToken accessToken: String): Mono<Boolean> {
+        return authService.logout(loginMember, accessToken)
     }
 
     @PostMapping(Uri.REFRESH)

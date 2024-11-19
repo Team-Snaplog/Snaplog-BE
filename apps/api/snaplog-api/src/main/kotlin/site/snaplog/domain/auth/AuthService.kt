@@ -3,7 +3,7 @@ package site.snaplog.domain.auth
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import site.snaplog.adapter.MemberAdapter
+import site.snaplog.adaptor.MemberAdaptor
 import site.snaplog.domain.auth.dto.request.LoginRequestDto
 import site.snaplog.domain.auth.dto.request.RefreshRequestDto
 import site.snaplog.domain.auth.dto.response.LoginResponseDto
@@ -18,7 +18,7 @@ import site.snaplog.security.service.JwtService
 @Service
 class AuthService(
     private val jwtService: JwtService,
-    private val memberAdapter: MemberAdapter,
+    private val memberAdaptor: MemberAdaptor,
     private val googleOAuth2Validator: GoogleOAuth2Validator,
     private val appleOAuth2Validator: AppleOAuth2Validator
 ) {
@@ -30,16 +30,14 @@ class AuthService(
         return getEmailFromProvider(loginRequestDto)
             .flatMap { email ->
                 logger.debug("idToken 검증 완료, email: $email")
-                memberAdapter.findMemberByEmail(email)
-                    .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "가입되지 않은 회원입니다.")))
+                memberAdaptor.findMemberByEmail(email)
+                    .switchIfEmpty(Mono.defer {
+                        logger.debug("회원 정보가 존재하지 않음, 회원 생성")
+                        memberAdaptor.save(MemberEntity(email = email, provider = loginRequestDto.provider))
+                    })
             }
             .flatMap { memberEntity ->
                 logger.debug("회원 조회 완료, email: ${memberEntity.email}")
-                jwtService.deleteBlacklist(memberEntity.email)
-                    .thenReturn(memberEntity)
-            }
-            .flatMap { memberEntity ->
-                logger.debug("블랙리스트 삭제 완료, email: ${memberEntity.email}")
                 jwtService.issueTokens(memberEntity.email)
             }
             .map { jwtPair ->
@@ -58,7 +56,7 @@ class AuthService(
         }
     }
 
-    fun logout(loginMember: MemberEntity, accessToken: String): Mono<Void> {
+    fun logout(loginMember: MemberEntity, accessToken: String): Mono<Boolean> {
         return jwtService.getJwtPayload(accessToken)
             .flatMap { jwtPayload ->
                 if (loginMember.email != jwtPayload["sub"]) {
@@ -67,16 +65,12 @@ class AuthService(
                     Mono.just(jwtPayload)
                 }
             }
-            .flatMap { jwtPayload ->
+            .flatMap {
                 jwtService.deleteJwtCache(loginMember.email)
                     .doOnSuccess { logger.debug("해당 회원 JWT 캐시 정보 삭제 완료") }
-                    .thenReturn(jwtPayload["exp"] as Long - System.currentTimeMillis())
             }
-            .flatMap { durationMillis ->
-                jwtService.saveBlacklist(loginMember.email, durationMillis)
-                    .doOnSuccess { logger.debug("블랙리스트 저장 완료") }
-            }
-            .then()
+            .map { true }
+
     }
 
     fun refresh(loginMember: MemberEntity, refreshRequestDto: RefreshRequestDto): Mono<LoginResponseDto> {

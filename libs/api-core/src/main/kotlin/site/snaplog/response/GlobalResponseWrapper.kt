@@ -18,7 +18,9 @@ class GlobalResponseWrapper(
 ) : ResponseBodyResultHandler(messageWriters, contentTypeResolver) {
 
     override fun supports(result: HandlerResult): Boolean {
-        if (result.returnTypeSource.declaringClass.name == "springfox.documentation.swagger.web.ApiResourceController") {
+        val className = result.returnTypeSource.declaringClass.name
+        if (className.startsWith("springfox.documentation.") ||
+            className.startsWith("org.springdoc.")) {
             return false
         }
 

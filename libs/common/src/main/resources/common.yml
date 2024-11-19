@@ -1,4 +1,8 @@
-spring:
-  config:
-    import:
-      - optional:application-jasypt.yml
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    algorithm: PBEWithMD5AndDES
+    pool-size: 2
+    string-output-type: base64
+    key-obtention-iterations: 1000
+    password: ${JASYPT_SECRET}

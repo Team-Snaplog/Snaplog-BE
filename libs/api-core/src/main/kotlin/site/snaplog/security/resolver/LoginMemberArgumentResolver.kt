@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.BindingContext
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver
 import org.springframework.web.server.ServerWebExchange
+import io.swagger.v3.oas.annotations.media.Schema
 import reactor.core.publisher.Mono
 import site.snaplog.entity.MemberEntity
 import site.snaplog.enums.StatusCode
@@ -30,12 +31,9 @@ class LoginMemberArgumentResolver(
             ReactiveSecurityContextHolder.getContext()
                 .map { it.authentication }
                 .flatMap { authentication ->
-                    when (val principal = authentication.principal) {
-                        is MemberEntity -> Mono.just(principal)
-                        else -> Mono.error(
-                            SnaplogException(StatusCode.UNAUTHORIZED, "잘못된 인증 정보입니다.")
-                        )
-                    }
+                    val email = authentication.principal as String
+                    memberRepository.findByEmail(email)
+                        .switchIfEmpty(Mono.error(SnaplogException(StatusCode.UNAUTHORIZED, "로그인된 회원 정보가 존재하지 않습니다.")))
                 }
         } else {
             Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "@LoginMember 어노테이션은 MemberEntity 타입만 지원합니다."))
@@ -45,4 +43,5 @@ class LoginMemberArgumentResolver(
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
+@Schema(hidden = true)
 annotation class LoginMember

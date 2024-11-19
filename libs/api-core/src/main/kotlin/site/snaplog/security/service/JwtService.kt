@@ -6,19 +6,16 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import site.snaplog.cache.BlacklistCache
 import site.snaplog.cache.JwtCache
 import site.snaplog.enums.JwtType
 import site.snaplog.enums.StatusCode
 import site.snaplog.exception.SnaplogException
-import site.snaplog.repository.BlacklistCacheRepository
 import site.snaplog.repository.JwtCacheRepository
 import java.util.*
 
 @Service
 class JwtService(
-    private val jwtCacheRepository: JwtCacheRepository,
-    private val blacklistCacheRepository: BlacklistCacheRepository
+    private val jwtCacheRepository: JwtCacheRepository
 ) {
 
     @Value("\${jwt.secret}")
@@ -79,20 +76,5 @@ class JwtService(
 
     fun deleteJwtCache(email: String): Mono<Boolean> {
         return jwtCacheRepository.deleteByEmail(email)
-    }
-
-    fun saveBlacklist(email: String, durationMillis: Long): Mono<BlacklistCache> {
-        val blacklist = BlacklistCache(email = email)
-        return blacklistCacheRepository.save(blacklist, durationMillis)
-    }
-
-    fun isBlacklisted(email: String): Mono<Boolean> {
-        return blacklistCacheRepository.findByEmail(email)
-            .map { true }
-            .switchIfEmpty(Mono.just(false))
-    }
-
-    fun deleteBlacklist(email: String):  Mono<Boolean> {
-        return blacklistCacheRepository.deleteByEmail(email)
     }
 }
