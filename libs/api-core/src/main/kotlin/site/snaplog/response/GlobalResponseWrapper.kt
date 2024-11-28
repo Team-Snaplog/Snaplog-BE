@@ -1,5 +1,6 @@
 package site.snaplog.response
 
+import org.springframework.http.MediaType
 import org.springframework.http.codec.HttpMessageWriter
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
@@ -9,8 +10,6 @@ import org.springframework.web.reactive.result.method.annotation.ResponseBodyRes
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import site.snaplog.enums.StatusCode
-import site.snaplog.exception.SnaplogException
 
 class GlobalResponseWrapper(
     messageWriters: List<HttpMessageWriter<*>>,
@@ -30,11 +29,11 @@ class GlobalResponseWrapper(
     }
 
     override fun handleResult(exchange: ServerWebExchange, result: HandlerResult): Mono<Void> {
-        val body = when (val value = result.returnValue) {
-            is Mono<*> -> value
+        return when (val value = result.returnValue) {
+            is Mono<*> -> value.flatMap { Mono.justOrEmpty(it) }
             is Flux<*> -> value.collectList()
             null -> Mono.empty()
-            else -> Mono.error(SnaplogException(StatusCode.INTERNAL_SERVER_ERROR, "반환 타입은 Mono 또는 Flux만 지원합니다."))
+            else -> Mono.just(value)
         }.map {
             SnaplogResponse(
                 status = 200,
@@ -47,10 +46,8 @@ class GlobalResponseWrapper(
                 message = "Success",
                 data = null
             )
-        )
-
-        val returnTypeSource = result.returnTypeSource
-
-        return writeBody(body, returnTypeSource, exchange)
+        ).flatMap {
+            writeBody(it, result.returnTypeSource, exchange)
+        }
     }
 }

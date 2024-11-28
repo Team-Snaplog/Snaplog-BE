@@ -22,9 +22,8 @@ class TopicService(
         return topicAdaptor.save(loginMember.id, createTopicRequestDto)
     }
 
-    fun deleteTopic(topicId: String): Mono<Boolean> {
+    fun deleteTopic(topicId: String): Mono<Void> {
         return topicAdaptor.delete(topicId)
-            .map { true }
     }
 
     fun updateTopic(topicId: String, updateTopicRequestDto: UpdateTopicRequestDto): Mono<TopicEntity> {
