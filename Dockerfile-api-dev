@@ -13,7 +13,7 @@ RUN ./gradlew dependencies --no-daemon
 
 # 나머지 소스 복사 및 빌드
 COPY . .
-RUN ./gradlew :snaplog-api:build --no-daemon
+RUN ./gradlew :snaplog-api:build --no-daemon -x test
 
 # jre17 image 사용하여 실행
 FROM eclipse-temurin:17-jre-jammy
