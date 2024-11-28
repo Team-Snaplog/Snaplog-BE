@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-deploy:
-    if: github.repository == 'Team-Snaplog'
+    if: github.repository == 'Team-Snaplog/Snaplog-BE'
     runs-on: ubuntu-latest
 
     steps:
