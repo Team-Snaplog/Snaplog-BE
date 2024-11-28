@@ -1,0 +1,48 @@
+name: Deploy API-Server to Dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'apps/api/snaplog-api/**'
+      - 'libs/**'
+
+jobs:
+  build-and-deploy:
+    if: github.repository == 'Team-Snaplog'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile-api-dev
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/snaplog-api-dev:latest
+
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_INSTANCE_IP_API_DEV }}
+          username: ${{ secrets.AWS_INSTANCE_USERNAME_API_DEV }}
+          key: ${{ secrets.AWS_INSTANCE_SSH_PRIVATE_KEY_API_DEV }}
+          script: |
+            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/snaplog-api-dev:latest
+            sudo docker stop $(docker ps -q) || true
+            sudo docker rm $(docker ps -a -q) || true
+            sudo docker run -d --name snaplog-api-dev -p 8080:8080 \
+              -e INFISICAL_TOKEN=${{ secrets.INFISICAL_TOKEN_API_DEV }} \
+              -e INFISICAL_PROJECT_ID=${{ secrets.INFISICAL_PROJECT_ID_API }} \
+              ${{ secrets.DOCKER_USERNAME }}/snaplog-api-dev:latest
