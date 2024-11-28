@@ -7,6 +7,8 @@ on:
     paths:
       - 'apps/api/snaplog-api/**'
       - 'libs/**'
+      - 'Dockerfile-api-dev'
+      - '.github/workflows/deploy-api-dev.yml'
 
 jobs:
   build-and-deploy:
@@ -40,9 +42,9 @@ jobs:
           script: |
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/snaplog-api-dev:latest
-            sudo docker stop $(docker ps -q) || true
-            sudo docker rm $(docker ps -a -q) || true
+            sudo docker stop $(sudo docker ps -q) || true
+            sudo docker rm $(sudo docker ps -a -q) || true
             sudo docker run -d --name snaplog-api-dev -p 8080:8080 \
               -e INFISICAL_TOKEN=${{ secrets.INFISICAL_TOKEN_API_DEV }} \
               -e INFISICAL_PROJECT_ID=${{ secrets.INFISICAL_PROJECT_ID_API }} \
-              ${{ secrets.DOCKER_USERNAME }}/snaplog-api-dev:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/snaplog-api-dev:latest
