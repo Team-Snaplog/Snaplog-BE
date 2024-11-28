@@ -56,7 +56,7 @@ class AuthService(
         }
     }
 
-    fun logout(loginMember: MemberEntity, accessToken: String): Mono<Boolean> {
+    fun logout(loginMember: MemberEntity, accessToken: String): Mono<Void> {
         return jwtService.getJwtPayload(accessToken)
             .flatMap { jwtPayload ->
                 if (loginMember.email != jwtPayload["sub"]) {
@@ -69,7 +69,7 @@ class AuthService(
                 jwtService.deleteJwtCache(loginMember.email)
                     .doOnSuccess { logger.debug("해당 회원 JWT 캐시 정보 삭제 완료") }
             }
-            .map { true }
+            .then()
 
     }
 
